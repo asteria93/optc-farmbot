@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPTC Farming Bot - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <h1>🤖 OPTC Farming Bot</h1>
+            </div>
+            <ul class="navbar-menu">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/accounts">Accounts</a></li>
+                <li><a href="/farming">Farming</a></li>
+                <li><a href="/settings">Settings</a></li>
+                <li><a href="/logs">Logs</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <section class="hero">
+                <h2>Welcome to OPTC Farming Bot</h2>
+                <p>Automated farming for One Piece Treasure Cruise</p>
+            </section>
+
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Accounts</h3>
+                    <p class="stat-value" id="total-accounts">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Sessions</h3>
+                    <p class="stat-value" id="active-sessions">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Runs</h3>
+                    <p class="stat-value" id="total-runs">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Rewards Earned</h3>
+                    <p class="stat-value" id="total-rewards">0</p>
+                </div>
+            </section>
+
+            <section class="dashboard-section">
+                <h3>Quick Actions</h3>
+                <div class="action-buttons">
+                    <a href="/accounts" class="btn btn-primary">Create Account</a>
+                    <a href="/farming" class="btn btn-success">Start Farming</a>
+                    <a href="/settings" class="btn btn-secondary">Configure</a>
+                </div>
+            </section>
+
+            <section class="dashboard-section">
+                <h3>Recent Activity</h3>
+                <div id="activity-log">
+                    <p>Loading activity...</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 OPTC Farming Bot. For educational purposes only.</p>
+            <p>⚠️ Warning: Using bots may violate game Terms of Service.</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
