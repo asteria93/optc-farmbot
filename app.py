@@ -19,14 +19,19 @@ logger = logging.getLogger(__name__)
 
 def create_app():
     """Create and configure the Flask application"""
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder='web/templates', static_folder='web/static')
     
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///farmbot.db')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # Enable CORS
     CORS(app, resources={r"/api/*": {"origins": os.getenv('ALLOWED_ORIGINS', '*')}})
+    
+    # Initialize database
+    from models import db
+    db.init_app(app)
     
     # Register blueprints
     from api.routes import api_bp
@@ -34,6 +39,11 @@ def create_app():
     
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(web_bp, url_prefix='/')
+    
+    # Create database tables
+    with app.app_context():
+        db.create_all()
+        logger.info('Database tables created')
     
     # Error handlers
     @app.errorhandler(404)
