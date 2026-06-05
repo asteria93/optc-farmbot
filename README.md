@@ -1,6 +1,7 @@
 # OPTC Farming Bot
 
-A comprehensive web-based bot for automating One Piece Treasure Cruise (OPTC) gameplay, including account creation, event farming, story mode progression, and mission completion.
+A comprehensive web-based bot for automating One Piece Treasure Cruise (OPTC) gameplay, including account creation, event farming, story mode progression, and mission completion. The Bot will be availeble soon.
+you can contact me on discord if you can give me github pro or for other questions :marshall.d.la.triche
 
 ## Features
 
