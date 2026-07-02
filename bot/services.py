@@ -240,12 +240,13 @@ def execute_farm_session(session_id):
         db.session.commit()
     except Exception as exc:
         logger.exception('Farming session failed')
+        safe_error = 'Automation run failed. Check worker logs for details.'
         session.status = 'failed'
-        session.last_error = str(exc)
+        session.last_error = safe_error
         session.end_time = datetime.utcnow()
         account.is_farming = False
         create_log(
-            f'Farming session failed: {exc}',
+            safe_error,
             level='ERROR',
             account_id=account.id,
             session_id=session.id,
