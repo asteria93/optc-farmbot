@@ -13,7 +13,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'dev-key')
 
 # Database
 MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb://localhost:27017/optc_farmbot')
-SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///optc_farmbot.db')
+SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///farmbot.db')
 
 # Redis
 REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')

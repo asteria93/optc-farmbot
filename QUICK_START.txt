@@ -1,0 +1,9 @@
+POUR WINDOWS:
+1. Double-clic setup_environment.bat
+2. Double-clic start_bot.bat
+3. Ouvre http://localhost:5000
+
+POUR MAC/LINUX:
+1. bash setup_environment.sh
+2. bash start_bot.sh
+3. Ouvre http://localhost:5000
