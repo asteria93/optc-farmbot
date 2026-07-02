@@ -33,7 +33,7 @@ def init_sqlite():
     try:
         import sqlite3
         
-        db_path = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///optc_farmbot.db').replace('sqlite:///', '')
+        db_path = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///farmbot.db').replace('sqlite:///', '')
         
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
