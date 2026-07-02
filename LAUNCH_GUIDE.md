@@ -55,9 +55,9 @@ brew services start redis
 ```
 
 **Windows:**
-- Download the Windows port from https://github.com/microsoftarchive/redis/releases
-- Or use Windows Subsystem for Linux (WSL) and follow the Linux steps above.
-- Or use the Docker approach: `docker run -d -p 6379:6379 redis:alpine`
+- **Recommended:** Install via WSL2 (Windows Subsystem for Linux) and follow the Linux steps above.
+- **Alternative:** Download Redis Stack for Windows from https://redis.io/downloads/
+- **Docker:** `docker run -d -p 6379:6379 redis:alpine`
 
 ### DLL Files (Windows only)
 

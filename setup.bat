@@ -63,8 +63,9 @@ echo [OK] Database initialized
 REM --- Redis reminder ---
 echo.
 echo NOTE: Redis must be running before you start the bot.
-echo   Download: https://github.com/microsoftarchive/redis/releases
-echo   Or use Docker: docker run -d -p 6379:6379 redis:alpine
+echo   Recommended: Use WSL2 (Windows Subsystem for Linux) and run Redis there.
+echo   Alternative: Redis Stack for Windows - https://redis.io/downloads/
+echo   Docker:      docker run -d -p 6379:6379 redis:alpine
 
 echo.
 echo ======================================
