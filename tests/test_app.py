@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 
 from app import create_app
-from models import Account, FarmSession, db
+from models import Account, FarmSession, Log, db
 
 
 class FlaskAppTestCase(unittest.TestCase):
@@ -137,6 +137,7 @@ class FlaskAppTestCase(unittest.TestCase):
         self.assertEqual(payload['account']['farming_status'], 'error')
         self.assertEqual(payload['account']['last_error'], 'login failed')
         self.assertEqual(payload['current_session']['status'], 'failed')
+        self.assertIsNotNone(Log.query.filter_by(account_id=created['id'], level='ERROR').first())
 
 
 if __name__ == '__main__':

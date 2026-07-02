@@ -280,8 +280,8 @@ def launch_farming_task(account_id, duration, farming_mode, session_id):
     if task_mode == 'inline':
         try:
             return _run_farming_loop(account_id, duration, farming_mode, session_id)
-        except Exception as exc:
-            return {'status': 'failed', 'error': str(exc)}
+        except Exception:
+            return {'status': 'failed'}
 
     if task_mode == 'manual':
         return {'status': 'queued'}
