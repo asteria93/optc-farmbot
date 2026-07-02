@@ -26,8 +26,17 @@ def _error(message, status=400):
     return jsonify({'error': message}), status
 
 
-def _get_account_or_404(account_id):
+def _get_account(account_id):
     return db.session.get(Account, account_id)
+
+
+def _parse_duration(value, default=1.0):
+    if value in (None, ''):
+        return float(default)
+    try:
+        return float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError('duration must be a valid number') from exc
 
 
 def _ensure_config(account, payload=None):
@@ -92,7 +101,7 @@ def list_accounts():
 
 @api_bp.route('/accounts/<int:account_id>', methods=['GET'])
 def get_account(account_id):
-    account = _get_account_or_404(account_id)
+    account = _get_account(account_id)
     if not account:
         return _error('Account not found', 404)
 
@@ -111,7 +120,7 @@ def get_account(account_id):
 
 @api_bp.route('/accounts/<int:account_id>', methods=['PUT'])
 def update_account(account_id):
-    account = _get_account_or_404(account_id)
+    account = _get_account(account_id)
     if not account:
         return _error('Account not found', 404)
 
@@ -155,7 +164,7 @@ def update_account(account_id):
 
 @api_bp.route('/accounts/<int:account_id>', methods=['DELETE'])
 def delete_account(account_id):
-    account = _get_account_or_404(account_id)
+    account = _get_account(account_id)
     if not account:
         return _error('Account not found', 404)
 
@@ -168,13 +177,16 @@ def delete_account(account_id):
 def start_farming():
     data = _get_payload()
     account_id = data.get('account_id')
-    duration = data.get('duration', 1)
+    try:
+        duration = _parse_duration(data.get('duration'), 1)
+    except ValueError as exc:
+        return _error(str(exc))
     farming_mode = (data.get('farming_mode') or 'balanced').lower()
 
     if account_id is None:
         return _error('account_id is required')
 
-    account = _get_account_or_404(account_id)
+    account = _get_account(account_id)
     if not account:
         return _error('Account not found', 404)
 
@@ -188,7 +200,7 @@ def start_farming():
     session = FarmSession(
         account_id=account.id,
         farming_mode=farming_mode,
-        duration_hours=float(duration),
+        duration_hours=duration,
         status='queued',
     )
     account.is_farming = True
@@ -210,7 +222,7 @@ def start_farming():
 
 @api_bp.route('/farming/stop/<int:account_id>', methods=['POST'])
 def stop_farming(account_id):
-    account = _get_account_or_404(account_id)
+    account = _get_account(account_id)
     if not account:
         return _error('Account not found', 404)
 
@@ -233,7 +245,7 @@ def stop_farming(account_id):
 
 @api_bp.route('/farming/status/<int:account_id>', methods=['GET'])
 def get_farming_status(account_id):
-    account = _get_account_or_404(account_id)
+    account = _get_account(account_id)
     if not account:
         return _error('Account not found', 404)
 
@@ -249,7 +261,7 @@ def get_farming_status(account_id):
 
 @api_bp.route('/farming/sessions/<int:account_id>', methods=['GET'])
 def get_farming_sessions(account_id):
-    account = _get_account_or_404(account_id)
+    account = _get_account(account_id)
     if not account:
         return _error('Account not found', 404)
 
@@ -259,7 +271,7 @@ def get_farming_sessions(account_id):
 
 @api_bp.route('/farming/logs/<int:account_id>', methods=['GET'])
 def get_farming_logs(account_id):
-    account = _get_account_or_404(account_id)
+    account = _get_account(account_id)
     if not account:
         return _error('Account not found', 404)
 

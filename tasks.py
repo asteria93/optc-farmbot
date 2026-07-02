@@ -168,7 +168,10 @@ def _run_farming_loop(account_id, duration, farming_mode='balanced', session_id=
         _authenticate_account(account)
         _log(account.id, 'Farming loop started')
 
-        duration = max(float(duration or 0), 0)
+        try:
+            duration = max(float(duration or 0), 0)
+        except (TypeError, ValueError) as exc:
+            raise ValueError('duration must be a valid number') from exc
         end_time = _now() + timedelta(hours=duration)
         cycle_count = 0
 
@@ -214,7 +217,7 @@ def _run_farming_loop(account_id, duration, farming_mode='balanced', session_id=
         _log(account.id, f'Farming loop completed after {cycle_count} cycle(s)', 'SUCCESS')
         _finalize_session(account, session, 'completed', 'Farming finished')
         return session.to_dict()
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         logger.exception('Farming loop failed for account %s', account_id)
         _log(account.id, f'Farming loop failed: {exc}', 'ERROR')
         _finalize_session(account, session, 'failed', str(exc))

@@ -70,7 +70,7 @@ def create_account():
 def start_account_farming(account_id):
     account = Account.query.get_or_404(account_id)
     try:
-        duration = float(request.form.get('duration', 1))
+        duration = float(request.form.get('duration') or '1')
     except (TypeError, ValueError):
         flash('Duration must be a valid number of hours.', 'error')
         return redirect(url_for('web.account_details', account_id=account.id))
