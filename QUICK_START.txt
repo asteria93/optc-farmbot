@@ -1,0 +1,14 @@
+=== LANCER LE BOT OPTC ===
+
+WINDOWS:
+1. Double-clic setup.bat
+2. Attends
+3. Double-clic start.bat
+4. Ouvre http://localhost:5000
+
+MAC/LINUX:
+1. Terminal: bash setup.sh
+2. Terminal: bash start.sh
+3. Ouvre http://localhost:5000
+
+C'est tout! 🎉
