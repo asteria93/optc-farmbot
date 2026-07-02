@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Account {{ account.username }}{% endblock %}
+{% block content %}
+<section class="hero">
+    <h2>Account {{ account.username }}</h2>
+    <p>Status: {{ account.farming_status }} | Platform: {{ account.platform }} | Version: {{ account.version }}</p>
+</section>
+
+<section class="dashboard-section">
+    <form method="post" action="{{ url_for('web.start_account_farming', account_id=account.id) }}" style="display:inline-block;">
+        <input name="duration" type="number" min="0" step="0.5" value="0">
+        <select name="farming_mode">
+            <option value="balanced">Balanced</option>
+            <option value="story">Story</option>
+            <option value="events">Events</option>
+            <option value="missions">Missions</option>
+            <option value="all">All</option>
+        </select>
+        <button class="btn btn-success" type="submit">Start Farming</button>
+    </form>
+    <form method="post" action="{{ url_for('web.stop_account_farming', account_id=account.id) }}" style="display:inline-block;">
+        <button class="btn btn-secondary" type="submit">Stop Farming</button>
+    </form>
+</section>
+
+<section class="stats-grid">
+    <div class="stat-card"><h3>Total Sessions</h3><p class="stat-value">{{ account.total_sessions }}</p></div>
+    <div class="stat-card"><h3>Total Items</h3><p class="stat-value">{{ account.total_items_farmed }}</p></div>
+    <div class="stat-card"><h3>Total EXP</h3><p class="stat-value">{{ account.total_exp_gained }}</p></div>
+    <div class="stat-card"><h3>Total Gold</h3><p class="stat-value">{{ account.total_gold }}</p></div>
+</section>
+
+<section class="dashboard-section">
+    <h3>Farming Sessions</h3>
+    {% if sessions %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Mode</th>
+                <th>Status</th>
+                <th>Items</th>
+                <th>EXP</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for session in sessions %}
+            <tr>
+                <td>{{ session.id }}</td>
+                <td>{{ session.farming_mode }}</td>
+                <td>{{ session.status }}</td>
+                <td>{{ session.items_collected }}</td>
+                <td>{{ session.exp_gained }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No farming sessions yet.</p>
+    {% endif %}
+</section>
+
+<section class="dashboard-section">
+    <h3>Logs</h3>
+    {% include "logs.html" %}
+</section>
+{% endblock %}

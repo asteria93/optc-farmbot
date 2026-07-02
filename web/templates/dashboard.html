@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - OPTC Farming Bot{% endblock %}
+{% block content %}
+<section class="hero">
+    <h2>Account Dashboard</h2>
+    <p>Manage OPTC accounts and launch automated farming loops.</p>
+</section>
+
+<section class="stats-grid">
+    <div class="stat-card"><h3>Total Accounts</h3><p class="stat-value">{{ stats.total_accounts }}</p></div>
+    <div class="stat-card"><h3>Active Sessions</h3><p class="stat-value">{{ stats.active_sessions }}</p></div>
+    <div class="stat-card"><h3>Total Items</h3><p class="stat-value">{{ stats.total_items }}</p></div>
+    <div class="stat-card"><h3>Total EXP</h3><p class="stat-value">{{ stats.total_exp }}</p></div>
+</section>
+
+<section class="dashboard-section">
+    <h3>Create Account</h3>
+    {% include "create_account.html" %}
+</section>
+
+<section class="dashboard-section">
+    <h3>Accounts</h3>
+    {% if accounts %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Platform</th>
+                <th>Version</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for account in accounts %}
+            <tr>
+                <td>{{ account.id }}</td>
+                <td><a href="{{ url_for('web.account_details', account_id=account.id) }}">{{ account.username }}</a></td>
+                <td>{{ account.platform }}</td>
+                <td>{{ account.version }}</td>
+                <td>{{ account.farming_status }}</td>
+                <td>
+                    <form method="post" action="{{ url_for('web.start_account_farming', account_id=account.id) }}" style="display:inline-block;">
+                        <input type="hidden" name="duration" value="0">
+                        <input type="hidden" name="farming_mode" value="balanced">
+                        <button class="btn btn-success" type="submit">Start</button>
+                    </form>
+                    <form method="post" action="{{ url_for('web.stop_account_farming', account_id=account.id) }}" style="display:inline-block;">
+                        <button class="btn btn-secondary" type="submit">Stop</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No accounts created yet.</p>
+    {% endif %}
+</section>
+
+<section class="dashboard-section">
+    <h3>Recent Activity</h3>
+    {% include "logs.html" %}
+</section>
+{% endblock %}
