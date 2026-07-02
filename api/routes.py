@@ -109,7 +109,12 @@ def start_farming():
     mode = data.get('mode', 'all')
     strategy = data.get('strategy', 'moderate')
 
-    account = db.session.get(Account, int(account_id)) if account_id else None
+    try:
+        account_id = int(account_id)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid or missing account_id'}), 400
+
+    account = db.session.get(Account, account_id)
     if not account:
         return jsonify({'error': 'Account not found'}), 404
 
@@ -146,7 +151,7 @@ def stop_farming(session_id):
     if not session:
         return jsonify({'error': 'Session not found'}), 404
 
-    if session.status in {'completed', 'failed', 'stopped'}:
+    if session.status in {FarmSession.STATUS_COMPLETED, FarmSession.STATUS_FAILED, FarmSession.STATUS_STOPPED}:
         return jsonify({'error': f'Session already {session.status}'}), 409
 
     stop_farm_session(session)

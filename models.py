@@ -5,6 +5,7 @@ db = SQLAlchemy()
 
 class Account(db.Model):
     __tablename__ = 'accounts'
+    STATUS_ACTIVE = 'active'
     
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), unique=True, nullable=False)
@@ -12,7 +13,7 @@ class Account(db.Model):
     password = db.Column(db.String(255), nullable=False)
     device_id = db.Column(db.String(255), nullable=True)
     optc_id = db.Column(db.String(255), nullable=True)
-    status = db.Column(db.String(20), default='active', nullable=False)
+    status = db.Column(db.String(20), default=STATUS_ACTIVE, nullable=False)
     preferences = db.Column(db.JSON, default=dict, nullable=False)
     
     # Farming stats
@@ -54,6 +55,11 @@ class Account(db.Model):
 
 class FarmSession(db.Model):
     __tablename__ = 'farm_sessions'
+    STATUS_QUEUED = 'queued'
+    STATUS_RUNNING = 'running'
+    STATUS_COMPLETED = 'completed'
+    STATUS_FAILED = 'failed'
+    STATUS_STOPPED = 'stopped'
     
     id = db.Column(db.Integer, primary_key=True)
     account_id = db.Column(db.Integer, db.ForeignKey('accounts.id'), nullable=False)
@@ -64,7 +70,7 @@ class FarmSession(db.Model):
     items_collected = db.Column(db.Integer, default=0)
     exp_gained = db.Column(db.Integer, default=0)
     total_runs = db.Column(db.Integer, default=0)
-    status = db.Column(db.String(50), default='queued')  # queued, running, completed, failed, stopped
+    status = db.Column(db.String(50), default=STATUS_QUEUED)  # queued, running, completed, failed, stopped
     task_id = db.Column(db.String(255), nullable=True)
     last_error = db.Column(db.Text, nullable=True)
     

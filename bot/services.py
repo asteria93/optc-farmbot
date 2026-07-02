@@ -4,7 +4,7 @@ Database-backed service layer for the OPTC farming bot.
 import logging
 from datetime import datetime
 
-from sqlalchemy import func
+from sqlalchemy import Integer, cast, func
 from werkzeug.security import generate_password_hash
 
 from bot.account_manager import AccountManager, AccountAuthenticator
@@ -73,7 +73,7 @@ def create_account_record(username, email, password, preferences=None):
         password=generate_password_hash(password),
         device_id=seeded_account['id'],
         optc_id=seeded_account['id'],
-        status='active',
+        status=Account.STATUS_ACTIVE,
         preferences=normalize_preferences(preferences),
     )
     db.session.add(account)
@@ -109,7 +109,7 @@ def create_farm_session(account, mode, strategy):
         account_id=account.id,
         farming_mode=parse_mode(mode).value,
         strategy=parse_strategy(strategy).value,
-        status='queued',
+        status=FarmSession.STATUS_QUEUED,
     )
     account.is_farming = True
     account.farming_mode = session.farming_mode
@@ -125,7 +125,7 @@ def create_farm_session(account, mode, strategy):
 
 
 def stop_farm_session(session):
-    session.status = 'stopped'
+    session.status = FarmSession.STATUS_STOPPED
     session.end_time = datetime.utcnow()
     session.account.is_farming = False
     create_log(
@@ -157,15 +157,15 @@ def execute_farm_session(session_id):
         raise ValueError(f'Farming session {session_id} not found')
 
     account = session.account
-    if session.status in {'completed', 'failed', 'stopped'}:
+    if session.status in {FarmSession.STATUS_COMPLETED, FarmSession.STATUS_FAILED, FarmSession.STATUS_STOPPED}:
         return session.to_dict()
 
-    session.status = 'running'
+    session.status = FarmSession.STATUS_RUNNING
     db.session.commit()
 
     try:
         authenticator = AccountAuthenticator()
-        token = authenticator.authenticate(account.username, account.password)
+        token = authenticator.authenticate(account.username, account.optc_id or str(account.id))
         create_log(
             f'Authenticated account session token {token[:8]}...',
             account_id=account.id,
@@ -228,7 +228,7 @@ def execute_farm_session(session_id):
         session.items_collected = items_collected
         session.exp_gained = total_rewards['experience']
         session.end_time = datetime.utcnow()
-        session.status = 'completed'
+        session.status = FarmSession.STATUS_COMPLETED
         session.last_error = None
 
         create_log(
@@ -241,7 +241,7 @@ def execute_farm_session(session_id):
     except Exception as exc:
         logger.exception('Farming session failed')
         safe_error = 'Automation run failed. Check worker logs for details.'
-        session.status = 'failed'
+        session.status = FarmSession.STATUS_FAILED
         session.last_error = safe_error
         session.end_time = datetime.utcnow()
         account.is_farming = False
@@ -257,8 +257,10 @@ def execute_farm_session(session_id):
 
 def account_statistics():
     total_accounts = db.session.query(func.count(Account.id)).scalar() or 0
-    active_accounts = db.session.query(func.count(Account.id)).filter_by(status='active').scalar() or 0
-    total_level = sum(max(1, int(account.total_exp_gained / 1000) + 1) for account in Account.query.all())
+    active_accounts = db.session.query(func.count(Account.id)).filter_by(status=Account.STATUS_ACTIVE).scalar() or 0
+    total_level = (
+        db.session.query(func.sum(cast(Account.total_exp_gained / 1000, Integer) + 1)).scalar() or 0
+    )
     total_rewards = (db.session.query(func.sum(Account.total_berry + Account.total_gold)).scalar() or 0)
     return {
         'total_accounts': total_accounts,
@@ -270,7 +272,12 @@ def account_statistics():
 
 def farming_statistics():
     total_sessions = db.session.query(func.count(FarmSession.id)).scalar() or 0
-    active_sessions = db.session.query(func.count(FarmSession.id)).filter(FarmSession.status.in_(['queued', 'running'])).scalar() or 0
+    active_sessions = (
+        db.session.query(func.count(FarmSession.id))
+        .filter(FarmSession.status.in_([FarmSession.STATUS_QUEUED, FarmSession.STATUS_RUNNING]))
+        .scalar()
+        or 0
+    )
     total_runs = db.session.query(func.sum(FarmSession.total_runs)).scalar() or 0
     return {
         'total_sessions': total_sessions,
