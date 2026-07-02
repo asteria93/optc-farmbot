@@ -2,9 +2,11 @@
 
 This guide explains how to get the current `asteria93/optc-farmbot` repository running from scratch.
 
-> Repository root used in this guide: `/home/runner/work/optc-farmbot/optc-farmbot`
+> Repository root used in this guide's environment: `/home/runner/work/optc-farmbot/optc-farmbot`
 >
-> If you cloned the project somewhere else, replace that path with your own clone path.
+> Shorthand used below: `<repo-root>`
+>
+> If you cloned the project somewhere else, replace `<repo-root>` with your own clone path.
 
 ---
 
@@ -14,17 +16,17 @@ This repository is **partially implemented**.
 
 What works today:
 - Installing the Python dependencies from `requirements.txt`
-- Initializing storage with `/home/runner/work/optc-farmbot/optc-farmbot/scripts/init_db.py`
-- Starting the Flask app with `/home/runner/work/optc-farmbot/optc-farmbot/app.py`
+- Initializing storage with `<repo-root>/scripts/init_db.py`
+- Starting the Flask app with `<repo-root>/app.py`
 - Opening the landing page at `http://localhost:5000/`
 - Using the JSON API under `http://localhost:5000/api/...`
-- Using the CLI in `/home/runner/work/optc-farmbot/optc-farmbot/bot/cli.py`
+- Using the CLI in `<repo-root>/bot/cli.py`
 
 What is **not fully wired in the current snapshot**:
 - No `celery_app.py` file exists, so `celery -A celery_app worker --loglevel=info` will fail unless you add Celery configuration yourself.
-- Only one HTML template exists: `/home/runner/work/optc-farmbot/optc-farmbot/web/templates/index.html`.
+- Only one HTML template exists: `<repo-root>/web/templates/index.html`.
   Routes such as `/dashboard`, `/accounts`, `/farming`, `/settings`, and `/logs` currently point to missing templates and will error until those files are created.
-- Account creation and farming are currently demo/in-memory flows in `/home/runner/work/optc-farmbot/optc-farmbot/api/routes.py`; they are not persistent background game automation yet.
+- Account creation and farming are currently demo/in-memory flows in `<repo-root>/api/routes.py`; they are not persistent background game automation yet.
 - No migration framework is configured. The app uses `db.create_all()` and the helper script instead of Alembic/Flask-Migrate.
 - No `src/bisque/`, DLL loader, or `sakura.db` integration exists in this repository snapshot.
 
@@ -132,7 +134,7 @@ python3 -m pip install --upgrade pip
 ```
 
 ### Install required packages
-The repository pins these versions in `/home/runner/work/optc-farmbot/optc-farmbot/requirements.txt`:
+The repository pins these versions in `<repo-root>/requirements.txt`:
 
 - Flask==2.3.3
 - Flask-CORS==4.0.0
@@ -209,7 +211,7 @@ Core imports OK
 
 ## Step 3: Redis setup (optional in the current repository)
 
-Redis is listed as a dependency and referenced in `/home/runner/work/optc-farmbot/optc-farmbot/.env.example`, but **the current repo snapshot does not contain a working Celery app module**.
+Redis is listed as a dependency and referenced in `<repo-root>/.env.example`, but **the current repo snapshot does not contain a working Celery app module**.
 
 That means:
 - You **can** install Redis now for future background-task support.
@@ -267,9 +269,9 @@ PONG
 ### Alternative if Redis is unavailable
 The current repository can still be launched **without Redis** because Flask and the demo API do not require it.
 
-Important accuracy note:
-- **Do not use SQLite as a Celery broker.** Celery does not support SQLite as a message broker.
-- In the current project state, the practical fallback is to **skip Celery entirely** and run the Flask app plus CLI/demo API only.
+> [!NOTE]
+> **Do not use SQLite as a Celery broker.** Celery does not support SQLite as a message broker.
+> In the current project state, the practical fallback is to **skip Celery entirely** and run the Flask app plus CLI/demo API only.
 
 ---
 
@@ -277,7 +279,7 @@ Important accuracy note:
 
 ### What the current repo uses
 The repository includes two storage paths:
-- MongoDB settings exist in `/home/runner/work/optc-farmbot/optc-farmbot/.env.example`
+- MongoDB settings exist in `<repo-root>/.env.example`
 - SQLite is the simplest option for local launch
 
 ### Initialize the database
@@ -315,8 +317,8 @@ You should see `optc_farmbot.db` in the repo root after initialization.
 There is **no migration tool configured** in the current repository.
 
 Current behavior instead:
-- `/home/runner/work/optc-farmbot/optc-farmbot/app.py` runs `db.create_all()` on startup
-- `/home/runner/work/optc-farmbot/optc-farmbot/scripts/init_db.py` can create basic tables manually
+- `<repo-root>/app.py` runs `db.create_all()` on startup
+- `<repo-root>/scripts/init_db.py` can create basic tables manually
 
 So there is no `flask db upgrade` or Alembic step yet.
 
@@ -327,13 +329,13 @@ So there is no `flask db upgrade` or Alembic step yet.
 The problem statement mentions DLL files, `src/bisque/`, `sakura.db`, and game resources. Those items are **not present in the current repository**.
 
 ### What exists today
-- Python source in `/home/runner/work/optc-farmbot/optc-farmbot/bot`
-- Flask app in `/home/runner/work/optc-farmbot/optc-farmbot/app.py`
-- Web assets in `/home/runner/work/optc-farmbot/optc-farmbot/web`
-- Database script in `/home/runner/work/optc-farmbot/optc-farmbot/scripts/init_db.py`
+- Python source in `<repo-root>/bot`
+- Flask app in `<repo-root>/app.py`
+- Web assets in `<repo-root>/web`
+- Database script in `<repo-root>/scripts/init_db.py`
 
 ### What does not exist today
-- `/home/runner/work/optc-farmbot/optc-farmbot/src/bisque/`
+- `<repo-root>/src/bisque/`
 - Any `.dll` files in the repo
 - Any `sakura.db` file in the repo
 - Any documented resource-import directory for mobile game assets
@@ -364,7 +366,7 @@ cp .env.example .env
 ```
 
 ### Variables explained
-The template lives at `/home/runner/work/optc-farmbot/optc-farmbot/.env.example`.
+The template lives at `<repo-root>/.env.example`.
 
 #### Flask
 - `FLASK_ENV=development`
@@ -449,7 +451,7 @@ PORT=5000
 The problem statement asks for JP/Global and iOS/Android selection, but the current repository does **not** expose those settings in the running UI or config files.
 
 ### What exists
-- Placeholder remote API configuration in `/home/runner/work/optc-farmbot/optc-farmbot/config/settings.py`
+- Placeholder remote API configuration in `<repo-root>/config/settings.py`
 - No implemented UI fields for server region/platform selection
 - No account schema field for region/platform in the current Flask models or API routes
 
@@ -544,7 +546,7 @@ celery -A celery_app worker --loglevel=info
 ```
 
 ### Current result
-In the current repository, this will fail because there is no `celery_app.py` module in `/home/runner/work/optc-farmbot/optc-farmbot`.
+In the current repository, this will fail because there is no `celery_app.py` module in `<repo-root>`.
 
 ### What you need before this command will work
 You would need all of the following first:
@@ -581,7 +583,7 @@ The current homepage shows:
 There is **no implemented login/registration flow** in the current repository.
 
 ### Navigate to accounts page
-The homepage links to `/accounts`, but that page is not implemented yet because `/home/runner/work/optc-farmbot/optc-farmbot/web/templates/accounts.html` does not exist.
+The homepage links to `/accounts`, but that page is not implemented yet because `<repo-root>/web/templates/accounts.html` does not exist.
 
 ### Use these alternatives instead
 - CLI account creation
@@ -639,7 +641,7 @@ Expected response:
 ```
 
 ### Current behavior note
-Accounts created through the current API are stored in memory inside `/home/runner/work/optc-farmbot/optc-farmbot/api/routes.py` and do not survive a server restart.
+Accounts created through the current API are stored in memory inside `<repo-root>/api/routes.py` and do not survive a server restart.
 
 ---
 
@@ -776,7 +778,7 @@ Use the JSON response and terminal logs instead.
 
 ## Step 17: Schedule farming
 
-The codebase includes a scheduler class in `/home/runner/work/optc-farmbot/optc-farmbot/bot/farmer.py`:
+The codebase includes a scheduler class in `<repo-root>/bot/farmer.py`:
 - `FarmingScheduler`
 
 However, it is **not connected to Flask routes or a persistent task runner** in the current repository.
@@ -928,7 +930,7 @@ cp optc_farmbot.db optc_farmbot.db.backup
 Current top-level layout:
 
 ```text
-/home/runner/work/optc-farmbot/optc-farmbot/
+<repo-root>/
 ├── app.py
 ├── .env.example
 ├── requirements.txt
@@ -960,23 +962,23 @@ Current top-level layout:
 ```
 
 ### What each main file does
-- `/home/runner/work/optc-farmbot/optc-farmbot/app.py`
+- `<repo-root>/app.py`
   - Creates the Flask app, loads env vars, registers blueprints, creates SQLAlchemy tables.
-- `/home/runner/work/optc-farmbot/optc-farmbot/api/routes.py`
+- `<repo-root>/api/routes.py`
   - Provides JSON endpoints for health, accounts, farming, and stats.
-- `/home/runner/work/optc-farmbot/optc-farmbot/web/routes.py`
+- `<repo-root>/web/routes.py`
   - Declares HTML page routes.
-- `/home/runner/work/optc-farmbot/optc-farmbot/models.py`
+- `<repo-root>/models.py`
   - Defines SQLAlchemy models.
-- `/home/runner/work/optc-farmbot/optc-farmbot/bot/cli.py`
+- `<repo-root>/bot/cli.py`
   - Command-line interface.
-- `/home/runner/work/optc-farmbot/optc-farmbot/bot/account_manager.py`
+- `<repo-root>/bot/account_manager.py`
   - In-memory account logic.
-- `/home/runner/work/optc-farmbot/optc-farmbot/bot/farmer.py`
+- `<repo-root>/bot/farmer.py`
   - Demo farming and scheduling logic.
-- `/home/runner/work/optc-farmbot/optc-farmbot/bot/api_client.py`
+- `<repo-root>/bot/api_client.py`
   - Placeholder async API wrapper.
-- `/home/runner/work/optc-farmbot/optc-farmbot/scripts/init_db.py`
+- `<repo-root>/scripts/init_db.py`
   - Manual DB/bootstrap script.
 
 ### Logs
@@ -984,11 +986,11 @@ Current logs are easiest to read from the terminal output of `python app.py`.
 
 ### Database location
 By default:
-- SQLite database: `/home/runner/work/optc-farmbot/optc-farmbot/optc_farmbot.db`
+- SQLite database: `<repo-root>/optc_farmbot.db`
 
 ### Custom scripts
 Place your own utility scripts under:
-- `/home/runner/work/optc-farmbot/optc-farmbot/scripts/`
+- `<repo-root>/scripts/`
 
 ---
 
