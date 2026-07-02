@@ -163,15 +163,15 @@ def _run_farming_loop(account_id, duration, farming_mode='balanced', session_id=
         return {'status': 'missing'}
 
     config = _get_or_create_config(account)
-    _update_running_state(account, session, 'running')
-    _authenticate_account(account)
-    _log(account.id, 'Farming loop started')
-
-    duration = max(float(duration or 0), 0)
-    end_time = _now() + timedelta(hours=duration)
-    cycle_count = 0
-
     try:
+        _update_running_state(account, session, 'running')
+        _authenticate_account(account)
+        _log(account.id, 'Farming loop started')
+
+        duration = max(float(duration or 0), 0)
+        end_time = _now() + timedelta(hours=duration)
+        cycle_count = 0
+
         while True:
             if _check_for_stop(session):
                 _log(account.id, 'Stop requested, shutting down farming loop')
@@ -207,7 +207,9 @@ def _run_farming_loop(account_id, duration, farming_mode='balanced', session_id=
             session.last_message = f'Completed farming cycle {cycle_count}'
             db.session.commit()
             if duration > 0:
-                time.sleep(min(current_app.config.get('FARMING_LOOP_SLEEP_SECONDS', 0), 1))
+                sleep_seconds = max(float(current_app.config.get('FARMING_LOOP_SLEEP_SECONDS', 0)), 0)
+                if sleep_seconds:
+                    time.sleep(sleep_seconds)
 
         _log(account.id, f'Farming loop completed after {cycle_count} cycle(s)', 'SUCCESS')
         _finalize_session(account, session, 'completed', 'Farming finished')
@@ -273,7 +275,10 @@ def launch_farming_task(account_id, duration, farming_mode, session_id):
     task_mode = app.config.get('FARMING_TASK_MODE', 'thread')
 
     if task_mode == 'inline':
-        return _run_farming_loop(account_id, duration, farming_mode, session_id)
+        try:
+            return _run_farming_loop(account_id, duration, farming_mode, session_id)
+        except Exception as exc:
+            return {'status': 'failed', 'error': str(exc)}
 
     if task_mode == 'manual':
         return {'status': 'queued'}

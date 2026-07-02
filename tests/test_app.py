@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from app import create_app
 from models import Account, FarmSession, db
@@ -120,6 +121,22 @@ class FlaskAppTestCase(unittest.TestCase):
         details = self.client.get(f"/account/{created['id']}")
         self.assertEqual(details.status_code, 200)
         self.assertIn(b'Account nami', details.data)
+
+    def test_farming_failure_is_logged_and_session_marked_failed(self):
+        created = self._create_account('ace')
+        with patch('tasks._authenticate_account', side_effect=RuntimeError('login failed')):
+            response = self.client.post('/api/farming/start', json={
+                'account_id': created['id'],
+                'duration': 0,
+                'farming_mode': 'balanced',
+            })
+        self.assertEqual(response.status_code, 202)
+
+        status = self.client.get(f"/api/farming/status/{created['id']}")
+        payload = status.get_json()
+        self.assertEqual(payload['account']['farming_status'], 'error')
+        self.assertEqual(payload['account']['last_error'], 'login failed')
+        self.assertEqual(payload['current_session']['status'], 'failed')
 
 
 if __name__ == '__main__':

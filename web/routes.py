@@ -1,7 +1,7 @@
 """
 Web dashboard routes.
 """
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from models import Account, FarmSession, Log
 from tasks import launch_farming_task
@@ -39,8 +39,10 @@ def create_account():
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '')
     if not username or not password:
+        flash('Username and password are required.', 'error')
         return redirect(url_for('web.dashboard'))
     if Account.query.filter_by(username=username).first():
+        flash('Username already exists.', 'error')
         return redirect(url_for('web.dashboard'))
 
     account = Account(
@@ -67,13 +69,18 @@ def create_account():
 @web_bp.route('/account/<int:account_id>/start-farming', methods=['POST'])
 def start_account_farming(account_id):
     account = Account.query.get_or_404(account_id)
-    duration = float(request.form.get('duration', 1))
+    try:
+        duration = float(request.form.get('duration', 1))
+    except (TypeError, ValueError):
+        flash('Duration must be a valid number of hours.', 'error')
+        return redirect(url_for('web.account_details', account_id=account.id))
     farming_mode = (request.form.get('farming_mode') or 'balanced').lower()
     active_session = FarmSession.query.filter(
         FarmSession.account_id == account.id,
         FarmSession.status.in_(['queued', 'running', 'stopping']),
     ).first()
     if active_session:
+        flash('This account already has an active farming session.', 'error')
         return redirect(url_for('web.account_details', account_id=account.id))
 
     session = FarmSession(

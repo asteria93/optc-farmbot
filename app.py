@@ -3,6 +3,7 @@ Main Flask application for OPTC Farming Bot web interface
 """
 import os
 import logging
+from datetime import datetime
 from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -53,6 +54,14 @@ def create_app(test_config=None):
     with app.app_context():
         db.create_all()
         logger.info('Database tables created')
+
+    @app.template_filter('format_timestamp')
+    def format_timestamp(value):
+        if value is None:
+            return ''
+        if isinstance(value, datetime):
+            return value.strftime('%Y-%m-%d %H:%M:%S')
+        return str(value)
     
     # Error handlers
     @app.errorhandler(404)

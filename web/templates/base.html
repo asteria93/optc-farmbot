@@ -14,6 +14,17 @@
             </div>
         </nav>
         <main class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <section class="dashboard-section">
+                        <ul>
+                        {% for category, message in messages %}
+                            <li>[{{ category|upper }}] {{ message }}</li>
+                        {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+            {% endwith %}
             {% block content %}{% endblock %}
         </main>
     </div>

@@ -3,7 +3,6 @@ API routes for account management, farming control, and statistics.
 """
 from datetime import datetime
 import logging
-import uuid
 
 from flask import Blueprint, jsonify, request
 from sqlalchemy import case, func
@@ -69,11 +68,12 @@ def create_account():
     account = Account(
         username=username,
         email=data.get('email'),
-        device_id=data.get('device_id') or uuid.uuid4().hex,
         platform=platform,
         version=version,
         farming_status='idle',
     )
+    if data.get('device_id'):
+        account.device_id = data.get('device_id')
     account.password = password
     db.session.add(account)
     db.session.flush()
