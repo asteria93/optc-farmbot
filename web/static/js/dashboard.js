@@ -30,10 +30,10 @@ async function loadActivityLog() {
         const html = response.sessions.map(session => `
             <div class="activity-item">
                 <strong>Account:</strong> ${session.account_id}<br>
-                <strong>Mode:</strong> ${session.mode}<br>
+                <strong>Mode:</strong> ${session.farming_mode}<br>
                 <strong>Status:</strong> <span style="color: ${session.status === 'active' ? 'green' : 'gray'}">${session.status}</span><br>
                 <strong>Started:</strong> ${api.formatDate(session.start_time)}<br>
-                <strong>Runs:</strong> ${session.runs}
+                <strong>Runs:</strong> ${session.total_runs}
             </div>
         `).join('');
         

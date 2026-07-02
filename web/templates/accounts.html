@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accounts - OPTC Farming Bot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="navbar-brand"><h1>🤖 OPTC Farming Bot</h1></div>
+            <ul class="navbar-menu">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/accounts">Accounts</a></li>
+                <li><a href="/farming">Farming</a></li>
+                <li><a href="/logs">Logs</a></li>
+            </ul>
+        </nav>
+        <main class="main-content">
+            <section class="dashboard-section">
+                <h2>Create Account</h2>
+                <form id="account-form">
+                    <input name="username" placeholder="Username" required>
+                    <input name="email" type="email" placeholder="Email" required>
+                    <input name="password" type="password" placeholder="Password" required>
+                    <button class="btn btn-primary" type="submit">Save Account</button>
+                </form>
+            </section>
+            <section class="dashboard-section">
+                <h2>Managed Accounts</h2>
+                <div id="accounts-list"><p>Loading accounts...</p></div>
+            </section>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        async function loadAccounts() {
+            const response = await window.api.call('/accounts');
+            const container = document.getElementById('accounts-list');
+            if (!response.accounts.length) {
+                container.innerHTML = '<p>No accounts configured.</p>';
+                return;
+            }
+            container.innerHTML = response.accounts.map(account => `
+                <div class="activity-item">
+                    <strong>${account.username}</strong><br>
+                    Status: ${account.status}<br>
+                    Farming: ${account.is_farming ? 'Active' : 'Idle'}<br>
+                    Rewards: ${account.berry} berries / ${account.gold} gold
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('account-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            await window.api.call('/accounts', 'POST', Object.fromEntries(formData.entries()));
+            event.target.reset();
+            await loadAccounts();
+        });
+
+        loadAccounts();
+    </script>
+</body>
+</html>
