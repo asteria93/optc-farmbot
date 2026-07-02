@@ -179,8 +179,8 @@ def start_farming():
     account_id = data.get('account_id')
     try:
         duration = _parse_duration(data.get('duration'), 1)
-    except ValueError as exc:
-        return _error(str(exc))
+    except ValueError:
+        return _error('duration must be a valid number')
     farming_mode = (data.get('farming_mode') or 'balanced').lower()
 
     if account_id is None:

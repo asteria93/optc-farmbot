@@ -98,6 +98,16 @@ class FlaskAppTestCase(unittest.TestCase):
         self.assertEqual(stats_payload['total_sessions'], 1)
         self.assertGreater(stats_payload['total_items_collected'], 0)
 
+    def test_start_farming_rejects_invalid_duration(self):
+        created = self._create_account('brook')
+        response = self.client.post('/api/farming/start', json={
+            'account_id': created['id'],
+            'duration': 'not-a-number',
+            'farming_mode': 'balanced',
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.get_json()['error'], 'duration must be a valid number')
+
     def test_stop_endpoint_marks_active_session(self):
         created = self._create_account('sanji')
         account = db.session.get(Account, created['id'])
