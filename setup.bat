@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 echo ==============================
 echo   OPTC Bot - Setup Windows
 echo ==============================
@@ -17,33 +18,33 @@ if errorlevel 1 (
 echo [OK] Python trouve
 echo.
 
-:: Installer les dependances
-echo Installation des dependances...
+:: Installer les dépendances
+echo Installation des dépendances...
 pip install -r requirements.txt
 if errorlevel 1 (
-    echo [ERREUR] Echec de l'installation des dependances.
+    echo [ERREUR] Échec de l'installation des dépendances.
     pause
     exit /b 1
 )
-echo [OK] Dependances installees
+echo [OK] Dépendances installées
 echo.
 
-:: Copier .env si necessaire
+:: Copier .env si nécessaire
 if not exist .env (
     if exist .env.example (
         copy .env.example .env
-        echo [OK] Fichier .env cree
+        echo [OK] Fichier .env créé
     )
 )
 
-:: Initialiser la base de donnees
-echo Initialisation de la base de donnees...
+:: Initialiser la base de données
+echo Initialisation de la base de données...
 python scripts/init_db.py
-echo [OK] Base de donnees initialisee
+echo [OK] Base de données initialisée
 echo.
 
 echo ==============================
-echo   Setup termine avec succes!
+echo   Setup terminé avec succès!
 echo   Lance maintenant: start.bat
 echo ==============================
 pause
