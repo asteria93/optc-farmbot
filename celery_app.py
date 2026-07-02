@@ -15,9 +15,6 @@ celery_app = Celery(
     broker=redis_url,
     backend=redis_url,
 )
-celery_app.conf.update(
-    task_ignore_result=True,
-)
 
 
 @celery_app.task(name='optc_farmbot.healthcheck')
