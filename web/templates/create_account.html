@@ -1,0 +1,19 @@
+<form method="post" action="{{ url_for('web.create_account') }}">
+    <input name="username" type="text" placeholder="Username" required>
+    <input name="password" type="password" placeholder="Password" required>
+    <input name="email" type="email" placeholder="Email">
+    <select name="platform">
+        <option value="android">Android</option>
+        <option value="ios">iOS</option>
+    </select>
+    <select name="version">
+        <option value="gb">Global</option>
+        <option value="jp">Japan</option>
+    </select>
+    <select name="refill_strategy">
+        <option value="skip">Skip Refills</option>
+        <option value="gems">Use Gems</option>
+        <option value="meat">Use Meat</option>
+    </select>
+    <button class="btn btn-primary" type="submit">Create Account</button>
+</form>

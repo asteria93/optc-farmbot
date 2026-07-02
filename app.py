@@ -3,7 +3,8 @@ Main Flask application for OPTC Farming Bot web interface
 """
 import os
 import logging
-from flask import Flask, render_template, jsonify
+from datetime import datetime
+from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 
@@ -17,7 +18,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def create_app():
+def create_app(test_config=None):
     """Create and configure the Flask application"""
     app = Flask(__name__, template_folder='web/templates', static_folder='web/static')
     
@@ -25,6 +26,13 @@ def create_app():
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///farmbot.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['CELERY_BROKER_URL'] = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+    app.config['CELERY_RESULT_BACKEND'] = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+    app.config['FARMING_TASK_MODE'] = os.getenv('FARMING_TASK_MODE', 'thread')
+    app.config['FARMING_LOOP_SLEEP_SECONDS'] = int(os.getenv('FARMING_LOOP_SLEEP_SECONDS', '0'))
+
+    if test_config:
+        app.config.update(test_config)
     
     # Enable CORS
     CORS(app, resources={r"/api/*": {"origins": os.getenv('ALLOWED_ORIGINS', '*')}})
@@ -32,6 +40,8 @@ def create_app():
     # Initialize database
     from models import db
     db.init_app(app)
+    from celery_app import configure_celery
+    configure_celery(app)
     
     # Register blueprints
     from api.routes import api_bp
@@ -44,6 +54,14 @@ def create_app():
     with app.app_context():
         db.create_all()
         logger.info('Database tables created')
+
+    @app.template_filter('format_timestamp')
+    def format_timestamp(value):
+        if value is None:
+            return ''
+        if isinstance(value, datetime):
+            return value.strftime('%Y-%m-%d %H:%M:%S')
+        return str(value)
     
     # Error handlers
     @app.errorhandler(404)

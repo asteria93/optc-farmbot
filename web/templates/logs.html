@@ -1,0 +1,10 @@
+{% set log_items = logs if logs is defined else recent_logs %}
+{% if log_items %}
+<ul>
+    {% for entry in log_items %}
+    <li>[{{ entry.level }}] {{ entry.message }}{% if entry.timestamp %} - {{ entry.timestamp|format_timestamp }}{% endif %}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No log entries yet.</p>
+{% endif %}
