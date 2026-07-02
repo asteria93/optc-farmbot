@@ -17,7 +17,7 @@ def index():
 @web_bp.route('/dashboard', methods=['GET'])
 def dashboard():
     """Farming dashboard"""
-    return render_template('dashboard.html')
+    return render_template('index.html')
 
 @web_bp.route('/accounts', methods=['GET'])
 def accounts_page():

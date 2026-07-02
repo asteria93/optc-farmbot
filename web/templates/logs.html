@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs - OPTC Farming Bot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="navbar-brand"><h1>🤖 OPTC Farming Bot</h1></div>
+        </nav>
+        <main class="main-content">
+            <section class="dashboard-section">
+                <h2>Automation Logs</h2>
+                <div id="logs-list"><p>Loading logs...</p></div>
+            </section>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        async function loadLogs() {
+            const response = await window.api.call('/logs');
+            const container = document.getElementById('logs-list');
+            if (!response.logs.length) {
+                container.innerHTML = '<p>No logs recorded yet.</p>';
+                return;
+            }
+            container.innerHTML = response.logs.map(log => `
+                <div class="activity-item">
+                    <strong>[${log.level}]</strong> ${log.message}<br>
+                    <small>${window.api.formatDate(log.timestamp)}</small>
+                </div>
+            `).join('');
+        }
+
+        loadLogs();
+    </script>
+</body>
+</html>

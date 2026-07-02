@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farming Control - OPTC Farming Bot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="navbar-brand"><h1>🤖 OPTC Farming Bot</h1></div>
+            <ul class="navbar-menu">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/accounts">Accounts</a></li>
+                <li><a href="/farming">Farming</a></li>
+                <li><a href="/logs">Logs</a></li>
+            </ul>
+        </nav>
+        <main class="main-content">
+            <section class="dashboard-section">
+                <h2>Start Farming</h2>
+                <form id="farm-form">
+                    <input name="account_id" placeholder="Account ID" required>
+                    <select name="mode">
+                        <option value="all">All content</option>
+                        <option value="story">Story</option>
+                        <option value="events">Events</option>
+                        <option value="missions">Missions</option>
+                        <option value="grinding">Grinding</option>
+                    </select>
+                    <select name="strategy">
+                        <option value="moderate">Moderate</option>
+                        <option value="aggressive">Aggressive</option>
+                        <option value="conservative">Conservative</option>
+                    </select>
+                    <button class="btn btn-success" type="submit">Queue Session</button>
+                </form>
+            </section>
+            <section class="dashboard-section">
+                <h2>Recent Sessions</h2>
+                <div id="sessions-list"><p>Loading sessions...</p></div>
+            </section>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        async function loadSessions() {
+            const response = await window.api.call('/farming/sessions');
+            const container = document.getElementById('sessions-list');
+            if (!response.sessions.length) {
+                container.innerHTML = '<p>No farming sessions yet.</p>';
+                return;
+            }
+            container.innerHTML = response.sessions.map(session => `
+                <div class="activity-item">
+                    <strong>Account ${session.account_id}</strong><br>
+                    Mode: ${session.mode}<br>
+                    Status: ${session.status}<br>
+                    Runs: ${session.runs}<br>
+                    Started: ${window.api.formatDate(session.start_time)}
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('farm-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const payload = Object.fromEntries(formData.entries());
+            payload.run_immediately = true;
+            await window.api.call('/farming/start', 'POST', payload);
+            await loadSessions();
+        });
+
+        loadSessions();
+    </script>
+</body>
+</html>
