@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}OPTC Farming Bot{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a href="/">🤖 OPTC Farming Bot</a>
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/accounts">Comptes</a></li>
+            <li><a href="/farming">Farming</a></li>
+            <li><a href="/settings">Paramètres</a></li>
+            <li><a href="/logs">Logs</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 OPTC Farming Bot - Usage éducatif uniquement.</p>
+        <p>⚠️ L'utilisation de bots peut violer les Conditions d'Utilisation du jeu.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

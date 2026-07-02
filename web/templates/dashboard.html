@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - OPTC Farming Bot{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="hero">
+        <h2>🎮 Dashboard</h2>
+        <p>Gérez et surveillez vos sessions de farming</p>
+    </section>
+
+    <section class="stats-grid">
+        <div class="stat-card">
+            <h3>Comptes Totaux</h3>
+            <p class="stat-value" id="total-accounts">-</p>
+        </div>
+        <div class="stat-card">
+            <h3>Sessions Actives</h3>
+            <p class="stat-value" id="active-sessions">-</p>
+        </div>
+        <div class="stat-card">
+            <h3>Runs Totaux</h3>
+            <p class="stat-value" id="total-runs">-</p>
+        </div>
+        <div class="stat-card">
+            <h3>Récompenses</h3>
+            <p class="stat-value" id="total-rewards">-</p>
+        </div>
+    </section>
+
+    <section class="dashboard-section">
+        <h3>Actions Rapides</h3>
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="window.location.href='/accounts'">
+                ➕ Créer un Compte
+            </button>
+            <button class="btn btn-success" id="start-all-btn" onclick="startAllFarming()">
+                ▶ Lancer le Farming
+            </button>
+            <button class="btn btn-danger" id="stop-all-btn" onclick="stopAllFarming()">
+                ■ Arrêter le Farming
+            </button>
+        </div>
+    </section>
+
+    <section class="dashboard-section">
+        <h3>Comptes</h3>
+        <div id="accounts-list">
+            <p class="loading">Chargement des comptes...</p>
+        </div>
+    </section>
+
+    <section class="dashboard-section">
+        <h3>Activité Récente</h3>
+        <div id="activity-log" class="log-container">
+            <p class="loading">Chargement des logs...</p>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+    async function loadStats() {
+        try {
+            const [accountsRes, farmingRes] = await Promise.all([
+                fetch('/api/stats/accounts'),
+                fetch('/api/stats/farming'),
+            ]);
+            const accounts = await accountsRes.json();
+            const farming = await farmingRes.json();
+
+            document.getElementById('total-accounts').textContent = accounts.total_accounts ?? 0;
+            document.getElementById('active-sessions').textContent = farming.active_sessions ?? 0;
+            document.getElementById('total-runs').textContent = farming.total_runs ?? 0;
+            document.getElementById('total-rewards').textContent = accounts.total_rewards_earned ?? 0;
+        } catch (e) {
+            console.error('Error loading stats:', e);
+        }
+    }
+
+    async function loadAccounts() {
+        try {
+            const res = await fetch('/api/accounts');
+            const data = await res.json();
+            const list = document.getElementById('accounts-list');
+
+            if (!data.accounts || data.accounts.length === 0) {
+                list.innerHTML = '<p>Aucun compte. <a href="/accounts">Créez un compte</a>.</p>';
+                return;
+            }
+
+            list.innerHTML = data.accounts.map(acc => `
+                <div class="account-card">
+                    <span class="account-name">${acc.username}</span>
+                    <span class="account-status status-${acc.status}">${acc.status}</span>
+                    <div class="account-actions">
+                        <button class="btn btn-sm btn-success" onclick="startFarming('${acc.id}')">▶ Start</button>
+                        <button class="btn btn-sm btn-danger" onclick="stopFarming('${acc.id}')">■ Stop</button>
+                    </div>
+                </div>
+            `).join('');
+        } catch (e) {
+            document.getElementById('accounts-list').innerHTML = '<p class="error">Erreur de chargement.</p>';
+        }
+    }
+
+    async function startFarming(accountId) {
+        try {
+            const res = await fetch('/api/farming/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ account_id: accountId, mode: 'all' }),
+            });
+            const data = await res.json();
+            alert(data.message || 'Farming démarré!');
+            loadStats();
+        } catch (e) {
+            alert('Erreur lors du démarrage du farming.');
+        }
+    }
+
+    async function stopFarming(sessionId) {
+        try {
+            const res = await fetch(`/api/farming/stop/${sessionId}`, { method: 'POST' });
+            const data = await res.json();
+            alert(data.message || 'Farming arrêté!');
+            loadStats();
+        } catch (e) {
+            alert('Erreur lors de l\'arrêt du farming.');
+        }
+    }
+
+    function startAllFarming() {
+        alert('Fonctionnalité: démarrer le farming pour tous les comptes actifs.');
+    }
+
+    function stopAllFarming() {
+        alert('Fonctionnalité: arrêter le farming pour tous les comptes actifs.');
+    }
+
+    // Initial load
+    loadStats();
+    loadAccounts();
+
+    // Refresh every 30 seconds
+    setInterval(() => {
+        loadStats();
+        loadAccounts();
+    }, 30000);
+</script>
+{% endblock %}
