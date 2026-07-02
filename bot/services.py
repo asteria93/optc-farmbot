@@ -21,6 +21,9 @@ DEFAULT_PREFERENCES = {
     'auto_sell': True,
     'auto_accept_gifts': True,
 }
+EXP_PER_LEVEL = 1000
+DAILY_GIFT_BERRIES = 25
+AUTO_SELL_GOLD_PER_ITEM = 10
 
 
 def normalize_preferences(preferences=None):
@@ -65,6 +68,14 @@ def create_log(message, level='INFO', account_id=None, session_id=None):
     return log_entry
 
 
+def calculate_level_from_exp(total_exp_gained):
+    return max(1, int(total_exp_gained / EXP_PER_LEVEL) + 1)
+
+
+def level_expression(column):
+    return cast(column / EXP_PER_LEVEL, Integer) + 1
+
+
 def create_account_record(username, email, password, preferences=None):
     seeded_account = AccountManager(None).create_account(username, email, password)
     account = Account(
@@ -91,7 +102,7 @@ def build_account_payload(account):
     return {
         'id': account.id,
         'username': account.username,
-        'level': max(1, int(account.total_exp_gained / 1000) + 1),
+        'level': calculate_level_from_exp(account.total_exp_gained),
         'berry': account.total_berry,
         'gold': account.total_gold,
         'experience': account.total_exp_gained,
@@ -198,16 +209,16 @@ def execute_farm_session(session_id):
 
         items_collected = len(farmer.farming_history)
         if preferences.get('auto_accept_gifts', True):
-            total_rewards['berries'] += 25
+            total_rewards['berries'] += DAILY_GIFT_BERRIES
             create_log(
-                'Accepted daily gifts and added 25 berries.',
+                f'Accepted daily gifts and added {DAILY_GIFT_BERRIES} berries.',
                 level='SUCCESS',
                 account_id=account.id,
                 session_id=session.id,
             )
 
         if preferences.get('auto_sell', True):
-            auto_sell_gold = items_collected * 10
+            auto_sell_gold = items_collected * AUTO_SELL_GOLD_PER_ITEM
             total_rewards['gold'] += auto_sell_gold
             create_log(
                 f'Auto-sold low-rarity drops for {auto_sell_gold} gold.',
@@ -258,9 +269,7 @@ def execute_farm_session(session_id):
 def account_statistics():
     total_accounts = db.session.query(func.count(Account.id)).scalar() or 0
     active_accounts = db.session.query(func.count(Account.id)).filter_by(status=Account.STATUS_ACTIVE).scalar() or 0
-    total_level = (
-        db.session.query(func.sum(cast(Account.total_exp_gained / 1000, Integer) + 1)).scalar() or 0
-    )
+    total_level = db.session.query(func.sum(level_expression(Account.total_exp_gained))).scalar() or 0
     total_rewards = (db.session.query(func.sum(Account.total_berry + Account.total_gold)).scalar() or 0)
     return {
         'total_accounts': total_accounts,
