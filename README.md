@@ -1,124 +1,130 @@
 # OPTC Farming Bot
 
-A comprehensive web-based bot for automating One Piece Treasure Cruise (OPTC) gameplay, including account creation, event farming, story mode progression, and mission completion. The Bot will be availeble soon.
-you can contact me on discord if you can give me github pro or for other questions :marshall.d.la.triche
+Bot d'automatisation pour One Piece Treasure Cruise (OPTC).
 
-## Features
+> Contact Discord pour questions : `marshall.d.la.triche`
 
-- 🤖 **Automated Account Creation** - Create multiple OPTC accounts automatically
-- 🎮 **Story Mode Farming** - Auto-complete story chapters
-- 🎪 **Event Farming** - Farm all available events and limited-time content
-- 📋 **Mission Completion** - Complete daily, weekly, and monthly missions
-- 🔄 **Continuous Farming** - Set schedules for automated farming runs
-- 📊 **Dashboard** - Web-based interface to monitor and control the bot
-- 🔐 **Account Management** - Manage multiple accounts with ease
-- 📈 **Progress Tracking** - Track farming progress and statistics
-- ⚙️ **Configuration** - Customize farming strategies and priorities
+---
 
-## Prerequisites
+## 🚀 COMMENT LANCER LE BOT - SIMPLE ET FACILE
 
-- Python 3.8+
-- pip (Python package manager)
-- MongoDB (optional, for account storage)
-- Redis (optional, for task queuing)
+### OPTION 1 : Télécharger le ZIP (Plus facile pour débuter)
 
-## Installation
+1. **Télécharge le ZIP du repo**
+   - Va sur : https://github.com/asteria93/optc-farmbot
+   - Clique sur le bouton vert **"Code"**
+   - Clique **"Download ZIP"**
+   - Décompresse le ZIP n'importe où
 
-1. Clone the repository:
+2. **Ouvre le dossier et lance le setup**
+
+   **Sur Windows :**
+   - Double-clic sur `setup.bat`
+   - Attends que tout s'installe (2-5 minutes)
+   - Double-clic sur `start.bat`
+   - C'est bon ! Le bot démarre 🎉
+
+   **Sur Mac/Linux :**
+   - Ouvre Terminal
+   - Va au dossier : `cd /chemin/vers/optc-farmbot`
+   - Tape : `bash setup.sh`
+   - Attends l'installation
+   - Tape : `bash start.sh`
+   - C'est bon ! 🎉
+
+3. **Accède au bot**
+   - Ouvre ton navigateur
+   - Va à : http://localhost:5000
+   - Tu vois le dashboard du bot
+
+---
+
+### OPTION 2 : Cloner avec Git (Pour devs)
+
 ```bash
 git clone https://github.com/asteria93/optc-farmbot.git
 cd optc-farmbot
+bash setup.sh   # ou setup.bat sur Windows
+bash start.sh   # ou start.bat sur Windows
 ```
 
-2. Create a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+---
 
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+### ✅ ÇA Y EST !
 
-4. Set up environment variables:
-```bash
-cp .env.example .env
-# Edit .env with your configuration
-```
+Le bot est lancé. Tu peux :
+- ✅ Créer des comptes
+- ✅ Lancer la ferme
+- ✅ Regarder les stats en temps réel
 
-5. Initialize the database:
-```bash
-python scripts/init_db.py
-```
+---
 
-## Usage
+### 🎮 PREMIER COMPTE
 
-### Start the Web Server
+1. Va sur http://localhost:5000
+2. Clique **"Créer un compte"**
+3. Remplis : username, password, plateforme (iOS/Android), version (JP/Global)
+4. Clique **"Créer"**
+5. Le compte est créé !
 
-```bash
-python app.py
-```
+---
 
-The web interface will be available at `http://localhost:5000`
+### ⚡ LANCER LA FERME
 
-### Create an Account
+1. Sélectionne un compte
+2. Clique **"Commencer la ferme"**
+3. Choisis la durée (1h, 2h, 4h, 8h)
+4. Clique **"Lancer"**
+5. Le bot farm automatiquement !
 
-```bash
-python -m bot.cli create-account --username "test_user" --password "password123"
-```
+Le bot fera tout :
+- ✅ Accepte les cadeaux
+- ✅ Complète l'histoire
+- ✅ Farm les événements
+- ✅ Farm les missions
+- ✅ Vend les cartes inutiles
+- ✅ Récupère la stamina
 
-### Start Farming
+---
 
-```bash
-python -m bot.cli start-farming --account-id "account_123" --mode "all"
-```
+### 🆘 ÇA MARCHE PAS ?
 
-### View Status
+**Le navigateur ne s'ouvre pas ?**
+- Ouvre manuellement : http://localhost:5000
 
-Visit the dashboard at `http://localhost:5000/dashboard` to monitor progress
+**Erreur Redis ?**
+- Télécharge Redis : https://redis.io/download
+- Relance `start.bat` ou `start.sh`
 
-## Project Structure
+**Port 5000 déjà utilisé ?**
+- Ferme l'ancienne instance du bot
+- Relance `start.bat` / `start.sh`
 
-```
-optc-farmbot/
-├── app.py                 # Flask web server
-├── requirements.txt       # Python dependencies
-├── .env.example          # Environment variables template
-├── README.md             # This file
-├── config/               # Configuration files
-├── bot/                  # Core bot logic
-├── api/                  # API endpoints
-├── web/                  # Web interface
-├── scripts/              # Utility scripts
-└── tests/                # Unit tests
-```
+---
 
-## Configuration
+### 📞 BESOIN D'AIDE ?
 
-Edit `config/settings.py` to customize:
-- Farming targets and priorities
-- Farming schedule
-- Account creation strategy
-- API endpoints
-- Bot behavior
+- Regarde les logs dans le dossier `logs/`
+- Redémarre le bot
+- Vérifie que Redis fonctionne
 
-## API Documentation
+---
 
-See `API.md` for detailed API endpoint documentation.
+## Features
+
+- 🤖 Automated Account Creation
+- 🎮 Story Mode Farming
+- 🎪 Event Farming
+- 📋 Mission Completion
+- 🔄 Continuous Farming
+- 📊 Web Dashboard
+- 🔐 Account Management
+- 📈 Progress Tracking
 
 ## Warning ⚠️
 
-**DISCLAIMER**: This bot is for educational purposes only. Using bots to automate mobile games may violate the game's Terms of Service. The author is not responsible for any account bans, data loss, or other consequences. Use at your own risk.
-
-## Contributing
-
-Contributions are welcome! Please follow the contribution guidelines in `CONTRIBUTING.md`
+**DISCLAIMER** : This bot is for educational purposes only. Using bots may violate the game's Terms of Service. Use at your own risk.
 
 ## License
 
-MIT License - see LICENSE file for details
-
-## Support
-
-For issues and questions, open an issue on GitHub.
+MIT License - see LICENSE file for details.
