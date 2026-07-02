@@ -121,9 +121,9 @@
         }
     }
 
-    async function stopFarming(sessionId) {
+    async function stopFarming(accountId) {
         try {
-            const res = await fetch(`/api/farming/stop/${sessionId}`, { method: 'POST' });
+            const res = await fetch(`/api/farming/stop/${accountId}`, { method: 'POST' });
             const data = await res.json();
             alert(data.message || 'Farming arrêté!');
             loadStats();

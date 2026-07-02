@@ -4,40 +4,40 @@ echo ""
 
 python3 --version > /dev/null 2>&1
 if [ $? -ne 0 ]; then
-    echo "Python3 n'est pas installe!"
+    echo "Python3 n'est pas installé!"
     echo "Installe Python3 avec: sudo apt install python3 python3-pip (Linux)"
     echo "ou depuis: https://www.python.org/downloads/ (Mac)"
     exit 1
 fi
 
-echo "Python3 est installe."
+echo "Python3 est installé."
 echo ""
 
-echo "Installation des dependances..."
+echo "Installation des dépendances..."
 pip3 install -r requirements.txt
 if [ $? -ne 0 ]; then
-    echo "Erreur lors de l'installation des dependances!"
+    echo "Erreur lors de l'installation des dépendances!"
     exit 1
 fi
 echo ""
 
-echo "Creation de la base de donnees..."
-python3 -c "from app import create_app; from models import db; app = create_app(); print('Base de donnees creee!')"
+echo "Création de la base de données..."
+python3 -c "from app import create_app; from models import db; app = create_app(); print('Base de données créée!')"
 if [ $? -ne 0 ]; then
-    echo "Erreur lors de la creation de la base de donnees!"
+    echo "Erreur lors de la création de la base de données!"
     exit 1
 fi
 echo ""
 
 if [ ! -f .env ]; then
     cp .env.example .env
-    echo "Fichier .env cree depuis .env.example"
-    echo "Modifie .env si necessaire."
+    echo "Fichier .env créé depuis .env.example"
+    echo "Modifie .env si nécessaire."
     echo ""
 fi
 
 echo "================================"
-echo "Installation terminee!"
+echo "Installation terminée!"
 echo ""
-echo "Pour demarrer le bot: bash start.sh"
+echo "Pour démarrer le bot: bash start.sh"
 echo "================================"

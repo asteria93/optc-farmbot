@@ -1,27 +1,27 @@
 #!/bin/bash
-echo "Demarrage du bot OPTC..."
+echo "Démarrage du bot OPTC..."
 echo ""
 
-echo "Demarrage de Redis..."
+echo "Démarrage de Redis..."
 if command -v redis-server &> /dev/null; then
     redis-server --daemonize yes
     sleep 2
-    echo "Redis demarre."
+    echo "Redis démarré."
 else
-    echo "Redis non trouve - le bot fonctionnera sans file de taches."
+    echo "Redis non trouvé - le bot fonctionnera sans file de tâches."
     echo "Installe Redis avec: sudo apt install redis-server (Linux)"
     echo "ou: brew install redis (Mac)"
 fi
 echo ""
 
-echo "Demarrage de Celery Worker..."
+echo "Démarrage de Celery Worker..."
 celery -A celery_app worker --loglevel=info &
 CELERY_PID=$!
 sleep 2
-echo "Celery Worker demarre (PID: $CELERY_PID)."
+echo "Celery Worker démarré (PID: $CELERY_PID)."
 echo ""
 
-echo "Demarrage de Flask..."
+echo "Démarrage de Flask..."
 echo "Dashboard disponible sur: http://localhost:5000"
 echo ""
 python3 app.py
