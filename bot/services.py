@@ -89,7 +89,7 @@ def create_account_record(username, email, password, preferences=None):
 
 def build_account_payload(account):
     return {
-        'id': str(account.id),
+        'id': account.id,
         'username': account.username,
         'level': max(1, int(account.total_exp_gained / 1000) + 1),
         'berry': account.total_berry,
@@ -152,7 +152,7 @@ def _mode_operations(mode, farmer, preferences):
 
 
 def execute_farm_session(session_id):
-    session = FarmSession.query.get(session_id)
+    session = db.session.get(FarmSession, session_id)
     if session is None:
         raise ValueError(f'Farming session {session_id} not found')
 

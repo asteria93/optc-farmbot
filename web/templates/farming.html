@@ -55,9 +55,9 @@
             container.innerHTML = response.sessions.map(session => `
                 <div class="activity-item">
                     <strong>Account ${session.account_id}</strong><br>
-                    Mode: ${session.mode}<br>
+                    Mode: ${session.farming_mode}<br>
                     Status: ${session.status}<br>
-                    Runs: ${session.runs}<br>
+                    Runs: ${session.total_runs}<br>
                     Started: ${window.api.formatDate(session.start_time)}
                 </div>
             `).join('');

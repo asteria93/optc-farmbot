@@ -58,7 +58,7 @@ class TestFlaskApp(unittest.TestCase):
         self.assertEqual(response.status_code, 202)
         session = response.get_json()['session']
         self.assertEqual(session['status'], 'completed')
-        self.assertEqual(session['runs'], 4)
+        self.assertEqual(session['total_runs'], 4)
 
         status = self.client.get(f"/api/farming/status/{session['id']}")
         self.assertEqual(status.status_code, 200)

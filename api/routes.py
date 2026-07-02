@@ -70,10 +70,10 @@ def create_account():
         'account': account.to_dict(),
     }), 201
 
-@api_bp.route('/accounts/<account_id>', methods=['GET'])
+@api_bp.route('/accounts/<int:account_id>', methods=['GET'])
 def get_account(account_id):
     """Get account details"""
-    account = Account.query.get(account_id)
+    account = db.session.get(Account, account_id)
     if not account:
         return jsonify({'error': 'Account not found'}), 404
     
@@ -83,10 +83,10 @@ def get_account(account_id):
     ]
     return jsonify({'account': account.to_dict(), 'recent_sessions': recent_sessions}), 200
 
-@api_bp.route('/accounts/<account_id>', methods=['DELETE'])
+@api_bp.route('/accounts/<int:account_id>', methods=['DELETE'])
 def delete_account(account_id):
     """Delete an account"""
-    account = Account.query.get(account_id)
+    account = db.session.get(Account, account_id)
     if not account:
         return jsonify({'error': 'Account not found'}), 404
 
@@ -109,7 +109,7 @@ def start_farming():
     mode = data.get('mode', 'all')
     strategy = data.get('strategy', 'moderate')
 
-    account = Account.query.get(account_id) if account_id else None
+    account = db.session.get(Account, int(account_id)) if account_id else None
     if not account:
         return jsonify({'error': 'Account not found'}), 404
 
@@ -119,8 +119,8 @@ def start_farming():
     try:
         parse_mode(mode)
         parse_strategy(strategy)
-    except ValueError as exc:
-        return jsonify({'error': str(exc)}), 400
+    except ValueError:
+        return jsonify({'error': 'Invalid farming mode or strategy'}), 400
 
     session = create_farm_session(account, mode, strategy)
     task_id, task_result = enqueue_farm_session(
@@ -131,7 +131,7 @@ def start_farming():
     db.session.commit()
 
     if task_result:
-        session = FarmSession.query.get(session.id)
+        session = db.session.get(FarmSession, session.id)
 
     logger.info('Farming started: %s - %s', account_id, mode)
     return jsonify({
@@ -139,10 +139,10 @@ def start_farming():
         'session': session.to_dict(),
     }), 202
 
-@api_bp.route('/farming/stop/<session_id>', methods=['POST'])
+@api_bp.route('/farming/stop/<int:session_id>', methods=['POST'])
 def stop_farming(session_id):
     """Stop farming session"""
-    session = FarmSession.query.get(session_id)
+    session = db.session.get(FarmSession, session_id)
     if not session:
         return jsonify({'error': 'Session not found'}), 404
 
@@ -157,10 +157,10 @@ def stop_farming(session_id):
         'session': session.to_dict(),
     }), 200
 
-@api_bp.route('/farming/status/<session_id>', methods=['GET'])
+@api_bp.route('/farming/status/<int:session_id>', methods=['GET'])
 def get_farming_status(session_id):
     """Get farming session status"""
-    session = FarmSession.query.get(session_id)
+    session = db.session.get(FarmSession, session_id)
     if not session:
         return jsonify({'error': 'Session not found'}), 404
 
